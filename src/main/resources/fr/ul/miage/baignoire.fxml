@@ -68,7 +68,7 @@
                   <Font size="18.0" />
                </font>
             </Text>
-            <Text layoutX="143.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0" wrappingWidth="201.9830722808838">
+            <Text fx:id="text_time" layoutX="143.0" layoutY="32.0" strokeType="OUTSIDE" strokeWidth="0.0" text="0" wrappingWidth="201.9830722808838">
                <font>
                   <Font size="18.0" />
                </font>

@@ -1,7 +1,11 @@
 package fr.ul.miage;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Timer;
+import java.util.TimerTask;
 
 import javafx.concurrent.WorkerStateEvent;
 import javafx.fxml.FXML;
@@ -21,6 +25,8 @@ public class MainController {
 	private TextField faucet_flow;
 	@FXML
 	private TextField hole_number;
+	@FXML
+	private Text text_time;
 	@FXML
 	private Pane holes_pane;
 	@FXML
@@ -49,13 +55,17 @@ public class MainController {
 		// bath.setProgress(0.0);
 		
 		remplissage.setOnSucceeded((WorkerStateEvent event) -> {
+			Instant top = Instant.now();
 			System.out.println("Fill started");
 			System.out.println(baignoire.volume_gagne);
 			System.out.println("Filled with " + robinet.getVit_remplissage());
 			bath.setProgress(baignoire.volume_gagne/baignoire.volume_tot);
 			if (baignoire.getVolume_gagne() >= baignoire.getVolume_tot()) {
 				System.out.println("Fill done.");
+				vidage.cancel();
 				remplissage.cancel();
+				Duration duration = Duration.between(top, Instant.now());
+				text_time.setText(String.valueOf(duration.toSeconds()));
 			}
 		});
 
@@ -64,7 +74,7 @@ public class MainController {
 			System.out.println(baignoire.volume_gagne);
 			System.out.println("Emptied by " + trou.getVit_vidage());
 			bath.setProgress(baignoire.volume_gagne/baignoire.volume_tot);
-			if (baignoire.getVolume_gagne() >= 0.0) {
+			if (baignoire.getVolume_gagne() <= 0.0) {
 				System.out.println("Emptying done.");
 				vidage.cancel();
 				remplissage.cancel();
@@ -81,11 +91,13 @@ public class MainController {
 			b_volume = Double.parseDouble(bath_volume.getText());
 			f_flow = Double.parseDouble(faucet_flow.getText());
 			
+			System.out.println("Holes flow : " + holes_flow);
 			baignoire.setVolume_tot(b_volume);
 			robinet.setVit_remplissage(f_flow);
 			trou.setVit_vidage(holes_flow);
 			
 			remplissage.start();
+			vidage.start();
 		} catch (NumberFormatException | NullPointerException e) {
 			System.out.println("A format is wrong : " + e);
 		}
